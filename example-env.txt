@@ -1,0 +1,5 @@
+# .env file contents
+LOCAL_HOST="https://example.com" // You can add your own domain name
+MONGODB_URI="mongodb://localhost:27017" // db host 
+DB_NAME="xxxxxx"
+IP_DETAILS_URL="http://ip-api.com/json" 

@@ -1,0 +1,21 @@
+[project]
+name = "linkly"
+version = "0.1.0"
+description = "Linkly is a fast, lightweight URL shortening service."
+readme = "README.md"
+requires-python = ">=3.12"
+
+authors = [
+  { name="Dorna Raj Gyawali", email="dronarajgyawali@gmail.com" }
+]
+
+dependencies = [
+    "fastapi>=0.115.13",
+    "httpx>=0.28.1",
+    "motor>=3.7.1",
+    "pydantic>=2.11.7",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
+    "python-dotenv>=1.1.0",
+    "uvicorn>=0.34.3",
+]
