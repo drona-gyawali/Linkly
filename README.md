@@ -1,10 +1,7 @@
-<p align="left">
-  <img src="https://raw.githubusercontent.com/drona-gyawali/My-Github-Assest/refs/heads/main/dumps/linkly.png" alt="Linkly Banner" style="height: 120px; object-fit: cover;" />
+<p align="center">
+  <img src="https://raw.githubusercontent.com/drona-gyawali/My-Github-Assest/refs/heads/main/dumps/linkly.png" alt="Linkly Banner" width="800" height="160"/>
 </p>
 
-
-
-# Linkly
 
 **Linkly** is a fast and lightweight URL shortener app built with **FastAPI** and **MongoDB**. It allows you to shorten long URLs, track analytics like number of clicks, and seamlessly handle redirections. Linkly is designed to be minimal, efficient, and developer-friendly.
 
