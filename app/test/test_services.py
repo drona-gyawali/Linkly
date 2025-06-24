@@ -83,7 +83,7 @@ async def test_resolves_url_not_found(mock_db_cm, mock_db):
     assert exc_info.value.status_code == 400
 
 @pytest.mark.asyncio
-@patch("app.services.shortner.httpx.AsyncClient.get")
+@patch("httpx.AsyncClient.get", new_callable=AsyncMock)
 async def test_url_analytics_updates(mock_httpx_get, mock_db_cm, mock_db, mock_request):
     # Setup HTTPX mock response
     mock_response = MagicMock()
