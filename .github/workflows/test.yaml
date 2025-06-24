@@ -1,0 +1,39 @@
+name: Run Tests with UV
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      LOCAL_HOST: http://localhost:8000
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Cache uv environment
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-3.12-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            uv-${{ runner.os }}-3.12-
+
+      - name: Install dependencies using uv
+        run: uv pip install --system -r pyproject.toml
+
+      - name: Install test tools
+        run: uv pip install --system pytest pytest-cov
+
+      - name: Run tests with coverage
+        run: pytest --cov=app --cov-report=term-missing
