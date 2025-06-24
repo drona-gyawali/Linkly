@@ -11,6 +11,12 @@ from app.services.shortner import (
     get_url_analytics,
 )
 
+from app.services import shortner
+
+@pytest.fixture(autouse=True)
+def set_local_host():
+    shortner.LOCAL_HOST = "http://localhost:8000"
+
 class AsyncContextManagerMock:
     def __init__(self, db):
         self.db = db
