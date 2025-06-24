@@ -28,11 +28,11 @@ jobs:
           restore-keys: |
             uv-${{ runner.os }}-3.12-
 
-      - name: Install dependencies using uv (correct way)
-        run: uv pip install -r pyproject.toml
+      - name: Install dependencies using uv
+        run: uv pip install --system -r pyproject.toml
 
-      - name: Install test tools (pytest + coverage)
-        run: uv pip install pytest pytest-cov
+      - name: Install test tools
+        run: uv pip install --system pytest pytest-cov
 
       - name: Run tests with coverage
         run: pytest --cov=app --cov-report=term-missing
