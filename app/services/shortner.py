@@ -111,3 +111,21 @@ async def get_url_analytics(
             entry["timestamp"] = entry["timestamp"].isoformat()
 
         return analytics_doc
+
+
+async def delete_url(
+        short_url:str,
+        db_cm
+):
+    async with db_cm as db:
+        is_valid = await db.urls.find_one({"short_url":short_url})
+        if not is_valid:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Url not found")
+        result = await db.urls.delete_one({"short_url":short_url})
+        if result.deleted_count == 0:
+            raise HTTPException(
+                status_code= status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Something went wrong"
+            )
+        return {"message": 'Url data successfully erased'}
+        

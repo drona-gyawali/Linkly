@@ -4,7 +4,12 @@ This module contains APIs used in our product
 from fastapi import  APIRouter, Depends, Request, HTTPException, status
 from fastapi import BackgroundTasks
 from fastapi.responses import RedirectResponse
-from app.services.shortner import shorten_url, resolves_url, url_analytics, get_url_analytics
+from app.services.shortner import (
+    shorten_url, resolves_url,
+    url_analytics,
+    get_url_analytics,
+    delete_url
+)
 from app.schemas  import UrlRequest, UrlResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.database import get_db
@@ -46,7 +51,7 @@ async def redirect_to_original(
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Contact the server maintainer  <dronarajgyawali@gmail.com>" 
+            detail="Something went wrong" 
         )
 
 
@@ -61,3 +66,15 @@ async def view_url_analytics(
     short_url = LOCAL_HOST + f'/{short_id}'
     response = await get_url_analytics(short_url=short_url, db_cm=db_cm)
     return response
+
+@router.get("/delete/{short_id}")
+async def delete_content(
+    short_id:str,
+    db_cm: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """
+    Endpoint that delete the whole data of given short_id
+    """
+    short_url = short_url = LOCAL_HOST + f'/{short_id}'
+    _del = await delete_url(short_url=short_url, db_cm=db_cm)
+    return _del
