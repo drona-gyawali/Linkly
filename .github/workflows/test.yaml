@@ -28,10 +28,10 @@ jobs:
           restore-keys: |
             uv-${{ runner.os }}-3.12-
 
-      - name: Install dependencies from uv.lock
-        run: uv pip install --requirements uv.lock
+      - name: Install dependencies using uv (correct way)
+        run: uv pip install -r pyproject.toml
 
-      - name: Install test tools
+      - name: Install test tools (pytest + coverage)
         run: uv pip install pytest pytest-cov
 
       - name: Run tests with coverage
