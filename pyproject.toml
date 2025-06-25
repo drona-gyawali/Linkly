@@ -11,11 +11,13 @@ authors = [
 
 dependencies = [
     "fastapi>=0.115.13",
+    "fastapi-cache2>=0.2.2",
     "httpx>=0.28.1",
     "motor>=3.7.1",
     "pydantic>=2.11.7",
     "pytest>=8.4.1",
     "pytest-asyncio>=1.0.0",
     "python-dotenv>=1.1.0",
+    "redis>=6.2.0",
     "uvicorn>=0.34.3",
 ]
