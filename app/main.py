@@ -1,6 +1,8 @@
-from fastapi import FastAPI
-from app.routes import shortner
+from app import app
 
-app = FastAPI()
+# from fastapi import FastAPI
+# from app.routes import shortner
 
-app.include_router(shortner.router)
+# app = FastAPI()
+
+# app.include_router(shortner.router)

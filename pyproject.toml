@@ -10,6 +10,7 @@ authors = [
 ]
 
 dependencies = [
+    "aioredis>=2.0.1",
     "fastapi>=0.115.13",
     "fastapi-cache2>=0.2.2",
     "httpx>=0.28.1",

@@ -3,7 +3,10 @@ import pytest_asyncio
 from unittest.mock import AsyncMock, patch, MagicMock
 from fastapi import HTTPException
 from datetime import datetime, timezone
-
+from app.services import shortner
+import redis.asyncio as redis
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
 from app.services.shortner import (
     shorten_url,
     resolves_url,
@@ -11,7 +14,12 @@ from app.services.shortner import (
     get_url_analytics,
 )
 
-from app.services import shortner
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def initialize_cache():
+    redis_client = redis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache-test")
+
 
 @pytest.fixture(autouse=True)
 def set_local_host():
@@ -24,6 +32,8 @@ class AsyncContextManagerMock:
         return self.db
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         return False
+    def __getattr__(self, name):
+        return getattr(self.db, name)
 
 @pytest.fixture
 def mock_db():

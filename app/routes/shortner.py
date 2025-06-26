@@ -10,9 +10,10 @@ from app.services.shortner import (
     get_url_analytics,
     delete_url
 )
+from fastapi_cache.decorator import cache
 from app.schemas  import UrlRequest, UrlResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from app.database import get_db
+from app.database import get_db, get_db_instance
 
 from app.settings import LOCAL_HOST
 
@@ -37,7 +38,7 @@ async def redirect_to_original(
     short_id: str,
     request:Request,
     background_tasks:BackgroundTasks,
-    db: AsyncIOMotorDatabase = Depends(get_db)
+    db: AsyncIOMotorDatabase = Depends(get_db_instance)
 ):
     """
     Take the short url and redirect to the original url destination.
@@ -46,16 +47,17 @@ async def redirect_to_original(
     try:
         short_url = LOCAL_HOST + f'/{short_id}'
         original_url = await resolves_url(short_url, db)
-        background_tasks.add_task(url_analytics, short_url, request, get_db())
+        background_tasks.add_task(url_analytics, short_url, request, get_db_instance())
         return RedirectResponse(url=original_url)
-    except Exception:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Something went wrong" 
+            detail=f"Something went wrong {str(e)}" 
         )
 
 
 @router.get("/analytics/{short_id}")
+@cache(expire=180)
 async def view_url_analytics(
     short_id: str, 
     db_cm: AsyncIOMotorDatabase = Depends(get_db)

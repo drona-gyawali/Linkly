@@ -8,6 +8,7 @@ from fastapi import Depends, Request
 from app.settings import LOCAL_HOST, IP_DETAILS_URL
 from fastapi import HTTPException, status
 from datetime import datetime, timezone
+from fastapi_cache.decorator import cache
 import httpx
 
 async def shorten_url(
@@ -28,23 +29,24 @@ async def shorten_url(
             return short_url
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
+    
+@cache(expire=180)
 async def resolves_url(
     short_url: str,
-    db_cm = Depends(get_db)
+    db_cm
 ):
     """
     Accept the short url and return the original url
     """
     try:
-        async with db_cm as db:
-            url_doc = await db.urls.find_one({"short_url": short_url})
-            if not url_doc:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, 
-                    detail={"error": f'{short_url} doenot exist in system'}
-                    )
-            return url_doc["original_url"]
+        print("Cache MISS: fetching from MongoDB")  # <- This should only print once per key
+        url_doc = await db_cm.urls.find_one({"short_url": short_url})
+        if not url_doc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, 
+                detail={"error": f'{short_url} doenot exist in system'}
+                )
+        return url_doc["original_url"]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
@@ -81,15 +83,14 @@ async def url_analytics(
         "location": location
     }
 
-    async with db_cm as db:
-        await db.url_analytics.update_one(
-            {"short_id": short_url},
-            {
-                "$inc": {"clicks": 1},
-                "$push": {"click_details": click_info}
-                },
-            upsert=True,
-        )
+    await db_cm.url_analytics.update_one(
+        {"short_id": short_url},
+        {
+            "$inc": {"clicks": 1},
+            "$push": {"click_details": click_info}
+            },
+        upsert=True,
+    )
 
 
 async def get_url_analytics(

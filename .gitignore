@@ -12,3 +12,6 @@ wheels/
 # Virtual environments
 .venv
 .env
+
+#redis dump file
+dump.rdp
