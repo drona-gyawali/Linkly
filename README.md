@@ -136,6 +136,52 @@ Returns click analytics.
 }
 ```
 
+### DELETE `/delete/{short_id}`
+
+Deletes all data associated with the given short ID.
+
+**Parameters:**
+
+| Name       | Type  | Description                                  |
+| ---------- | ----- | -------------------------------------------- |
+| `short_id` | `str` | Unique identifier of the short URL to delete |
+
+**Response:**
+
+```json
+{
+  "detail": "Short URL successfully deleted."
+}
+```
+
+---
+## Running MongoDB and Redis via Docker
+
+You can quickly start MongoDB and Redis using `docker-compose.yaml`.
+
+
+### 2. Start services
+
+```bash
+docker-compose up -d
+```
+
+This will start MongoDB on port `27017` and Redis on port `6379`.
+
+---
+
+### 3. Stop services
+
+```bash
+docker-compose down
+```
+
+---
+
+You can now connect your app to these services using:
+
+* MongoDB URI: `mongodb://localhost:27017`
+* Redis host: `localhost`, port `6379`
 
 ---
 
