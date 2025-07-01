@@ -29,6 +29,8 @@ class UrlAnalytics(BaseModel):
     short_id: str
     clicks: int = 0
     click_details: List[ClickInfo] = []
+    finger_print : set[str] = set()
+
 
     class Config:
         arbitrary_types_allowed = True

@@ -125,12 +125,21 @@ async def test_resolves_url_not_found(mock_db_cm, mock_db):
 #     assert isinstance(click_info["timestamp"], datetime)
 
 @pytest.mark.asyncio
-async def test_url_analytics_ip_api_failure(mock_db_cm, mock_db, mock_request):
-    # Simulate httpx raising exception (e.g., network failure)
+async def test_url_analytics_ip_api_failure(mock_db_cm, mock_request):
     with patch("app.services.shortner.httpx.AsyncClient.get", side_effect=Exception("fail")):
-        mock_db.url_analytics.update_one = AsyncMock(return_value=None)
+        mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
+        mock_db_cm.url_analytics.update_one = AsyncMock()
+
         await url_analytics("http://localhost:8000/abc123", mock_request, mock_db_cm)
-        mock_db.url_analytics.update_one.assert_called_once()
+
+        mock_db_cm.url_analytics.find_one.assert_called_once_with({"short_id": "http://localhost:8000/abc123"})
+
+        mock_db_cm.url_analytics.update_one.assert_called_once()
+        args, kwargs = mock_db_cm.url_analytics.update_one.call_args
+
+        assert args[0] == {"short_id": "http://localhost:8000/abc123"}
+        assert "$inc" in args[1]
+        assert "$push" in args[1]
 
 @pytest.mark.asyncio
 async def test_get_url_analytics_found(mock_db_cm, mock_db):

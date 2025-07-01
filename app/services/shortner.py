@@ -39,7 +39,6 @@ async def resolves_url(
     Accept the short url and return the original url
     """
     try:
-        print("Cache MISS: fetching from MongoDB")  # <- This should only print once per key
         url_doc = await db_cm.urls.find_one({"short_url": short_url})
         if not url_doc:
             raise HTTPException(
@@ -63,7 +62,7 @@ async def url_analytics(
     # yo chai yesso test ko lagi ho hai..
     if user_ip == "127.0.0.1":
         user_ip = "8.8.8.8"
-
+    fingerprint = f"{user_ip}{header}"
     location = None
     try:
         async with httpx.AsyncClient() as client:
@@ -83,14 +82,23 @@ async def url_analytics(
         "location": location
     }
 
-    await db_cm.url_analytics.update_one(
-        {"short_id": short_url},
-        {
-            "$inc": {"clicks": 1},
-            "$push": {"click_details": click_info}
-            },
-        upsert=True,
-    )
+    unique_fingerprint = await db_cm.url_analytics.find_one({"short_id": short_url})
+    if not unique_fingerprint or fingerprint not in (unique_fingerprint.get("finger_print") or []):
+        await db_cm.url_analytics.update_one(
+            {"short_id": short_url},
+            {
+                "$inc": {"clicks": 1},
+                "$push": {"click_details": click_info}
+                },
+            upsert=True,
+        )
+    else:
+        await  db_cm.url_analytics.update_one(
+            {"short_id" : short_url},
+            {
+                "$push": {"click_details": click_info}
+            }
+        )
 
 
 async def get_url_analytics(
