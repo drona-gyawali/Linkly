@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,4 +11,4 @@ BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 # you can use api url from https://ip-api.com/json service : this for analytics purpose
 # keeping secret because of some concern
-IP_DETAILS_URL = os.getenv("IP_DETAILS_URL") 
+IP_DETAILS_URL = os.getenv("IP_DETAILS_URL")

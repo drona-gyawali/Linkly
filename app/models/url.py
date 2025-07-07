@@ -1,22 +1,26 @@
 """
-This module contains the collections for urls 
+This module contains the collections for urls
 """
-from pydantic  import BaseModel, Field
-from app.utils.dtype import PyObjectId
-from bson import ObjectId
-from typing import List, Optional
+
 from datetime import datetime
+from typing import List, Optional
+
+from bson import ObjectId
+from pydantic import BaseModel, Field
+
+from app.utils.dtype import PyObjectId
 
 
 class UrlDbObject(BaseModel):
-    id:PyObjectId = Field(alias= '_id', default_factory=PyObjectId)
-    original_url:str
-    short_id:str
+    id: PyObjectId = Field(alias="_id", default_factory=PyObjectId)
+    original_url: str
+    short_id: str
 
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
         populate_by_name = True
+
 
 class ClickInfo(BaseModel):
     user_agent: str
@@ -27,6 +31,7 @@ class ClickInfo(BaseModel):
     utm_medium: Optional[str] = None
     utm_campaign: Optional[str] = None
 
+
 class UrlAnalytics(BaseModel):
     id: ObjectId = Field(default_factory=ObjectId, alias="_id")
     short_id: str
@@ -36,7 +41,4 @@ class UrlAnalytics(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {
-            ObjectId: str,
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {ObjectId: str, datetime: lambda v: v.isoformat()}

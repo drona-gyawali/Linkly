@@ -1,8 +1,10 @@
+from contextlib import asynccontextmanager
+
+import redis.asyncio as redis
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-import redis.asyncio as redis
-from contextlib import asynccontextmanager
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -10,6 +12,8 @@ async def lifespan(app: FastAPI):
     FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
     yield
 
+
 from app.routes import shortner
+
 app = FastAPI(lifespan=lifespan)
 app.include_router(shortner.router)

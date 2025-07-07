@@ -1,30 +1,29 @@
 """
 This module contains APIs used in our product
 """
-from fastapi import  APIRouter, Depends, Request, HTTPException, status
-from fastapi import BackgroundTasks
-from fastapi.responses import RedirectResponse
-from app.services.shortner import (
-    shorten_url, resolves_url,
-    url_analytics,
-    get_url_analytics,
-    delete_url
-)
-from fastapi_cache.decorator import cache
-from app.schemas  import UrlRequest, UrlResponse
-from motor.motor_asyncio import AsyncIOMotorDatabase
-from app.database import get_db, get_db_instance
 
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi.responses import RedirectResponse
+from fastapi_cache.decorator import cache
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
+from app.database import get_db, get_db_instance
+from app.schemas import UrlRequest, UrlResponse
+from app.services.shortner import (
+    delete_url,
+    get_url_analytics,
+    resolves_url,
+    shorten_url,
+    url_analytics,
+)
 from app.settings import LOCAL_HOST
 
-router = APIRouter(
-    tags=['Url']
-)
+router = APIRouter(tags=["Url"])
 
-@router.post('/shorten',response_model=UrlResponse)
+
+@router.post("/shorten", response_model=UrlResponse)
 async def create_short_url(
-    data:UrlRequest,
-    db: AsyncIOMotorDatabase = Depends(get_db)
+    data: UrlRequest, db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """
     Take the data object and return json response.
@@ -33,44 +32,44 @@ async def create_short_url(
     return UrlResponse(original_url=data.original_url, short_url=short)
 
 
-@router.get('/{short_id}')
+@router.get("/{short_id}")
 async def redirect_to_original(
     short_id: str,
-    request:Request,
-    background_tasks:BackgroundTasks,
-    db: AsyncIOMotorDatabase = Depends(get_db_instance)
+    request: Request,
+    background_tasks: BackgroundTasks,
+    db: AsyncIOMotorDatabase = Depends(get_db_instance),
 ):
     """
     Take the short url and redirect to the original url destination.
     Also track analytics in background
     """
     try:
-        short_url = LOCAL_HOST + f'/{short_id}'
+        short_url = LOCAL_HOST + f"/{short_id}"
         original_url = await resolves_url(short_url, db)
         background_tasks.add_task(url_analytics, short_url, request, get_db_instance())
         return RedirectResponse(url=original_url)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Something went wrong {str(e)}" 
+            detail=f"Something went wrong {str(e)}",
         )
 
 
 @router.get("/analytics/{short_id}")
 @cache(expire=180)
 async def view_url_analytics(
-    short_id: str, 
+    short_id: str,
     utm_source: str | None = None,
     utm_medium: str | None = None,
     utm_campaign: str | None = None,
-    db_cm: AsyncIOMotorDatabase = Depends(get_db)
+    db_cm: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """
     Endpoint that gives the json data related to the Url, optionally filtered by UTM parameters.
     """
-    short_url = LOCAL_HOST + f'/{short_id}'
+    short_url = LOCAL_HOST + f"/{short_id}"
     response = await get_url_analytics(
-        short_url=short_url, 
+        short_url=short_url,
         db_cm=db_cm,
         utm_source=utm_source,
         utm_medium=utm_medium,
@@ -80,13 +79,10 @@ async def view_url_analytics(
 
 
 @router.get("/delete/{short_id}")
-async def delete_content(
-    short_id:str,
-    db_cm: AsyncIOMotorDatabase = Depends(get_db)
-):
+async def delete_content(short_id: str, db_cm: AsyncIOMotorDatabase = Depends(get_db)):
     """
     Endpoint that delete the whole data of given short_id
     """
-    short_url = short_url = LOCAL_HOST + f'/{short_id}'
+    short_url = short_url = LOCAL_HOST + f"/{short_id}"
     _del = await delete_url(short_url=short_url, db_cm=db_cm)
     return _del
