@@ -4,7 +4,7 @@ This module contains the collections for urls
 from pydantic  import BaseModel, Field
 from app.utils.dtype import PyObjectId
 from bson import ObjectId
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 
 
@@ -21,17 +21,22 @@ class UrlDbObject(BaseModel):
 class ClickInfo(BaseModel):
     user_agent: str
     timestamp: datetime
-    ip: str | None = None
-    location: str | None = None
+    ip: Optional[str] = None
+    location: Optional[str] = None
+    utm_source: Optional[str] = None
+    utm_medium: Optional[str] = None
+    utm_campaign: Optional[str] = None
 
 class UrlAnalytics(BaseModel):
     id: ObjectId = Field(default_factory=ObjectId, alias="_id")
     short_id: str
     clicks: int = 0
     click_details: List[ClickInfo] = []
-    finger_print : set[str] = set()
-
+    finger_print: List[str] = []
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, datetime: lambda v: v.isoformat()}
+        json_encoders = {
+            ObjectId: str,
+            datetime: lambda v: v.isoformat()
+        }

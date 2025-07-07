@@ -116,7 +116,15 @@ http://127.0.0.1:8000/docs#/Url/create_short_url_shorten_post
 
 ### GET `/analytics/{short_id}`
 
-Returns click analytics.
+Returns click analytics for the given short URL, optionally filtered by UTM parameters.
+
+**Query Parameters (optional):**
+
+| Name           | Type   | Description                   |
+| -------------- | ------ | ----------------------------- |
+| `utm_source`   | string | Filter clicks by UTM source   |
+| `utm_medium`   | string | Filter clicks by UTM medium   |
+| `utm_campaign` | string | Filter clicks by UTM campaign |
 
 **Response:**
 
@@ -129,11 +137,15 @@ Returns click analytics.
       "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0",
       "ip": "8.8.8.8",
       "timestamp": "2025-06-23T09:11:47.636000",
-      "location": "Ashburn, United States"
+      "location": "Ashburn, United States",
+      "utm_source": "instagram",
+      "utm_medium": "story",
+      "utm_campaign": "summer_sale"
     }
   ],
   "clicks": 1
 }
+
 ```
 
 ### DELETE `/delete/{short_id}`
