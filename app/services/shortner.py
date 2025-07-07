@@ -42,7 +42,7 @@ async def resolves_url(
         url_doc = await db_cm.urls.find_one({"short_url": short_url})
         if not url_doc:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, 
+                status_code=status.HTTP_400_BAD_REQUEST, 
                 detail={"error": f'{short_url} doenot exist in system'}
                 )
         return url_doc["original_url"]
