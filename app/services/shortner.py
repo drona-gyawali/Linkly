@@ -1,19 +1,21 @@
 """
 This module contains the service level logic for the api.
 """
-from app.database import get_db
-from motor.motor_asyncio import AsyncIOMotorDatabase
-from app.utils.encode_url import ShortIdGenerator
-from fastapi import Depends, Request
-from app.settings import LOCAL_HOST, IP_DETAILS_URL
-from fastapi import HTTPException, status
+
 from datetime import datetime, timezone
-from fastapi_cache.decorator import cache
+
 import httpx
+from fastapi import Depends, HTTPException, Request, status
+from fastapi_cache.decorator import cache
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
+from app.database import get_db
+from app.settings import IP_DETAILS_URL, LOCAL_HOST
+from app.utils.encode_url import ShortIdGenerator
+
 
 async def shorten_url(
-    original_url:str,
-    db_cm: AsyncIOMotorDatabase = Depends(get_db)
+    original_url: str, db_cm: AsyncIOMotorDatabase = Depends(get_db)
 ) -> str:
     """
     Take the long url as input and return working short url
@@ -21,20 +23,17 @@ async def shorten_url(
     try:
         async with db_cm as db:
             hash = ShortIdGenerator.generate()
-            short_url = LOCAL_HOST + f'/{hash}'
-            await db.urls.insert_one({
-                "original_url": original_url,
-                "short_url": short_url
-            })
+            short_url = LOCAL_HOST + f"/{hash}"
+            await db.urls.insert_one(
+                {"original_url": original_url, "short_url": short_url}
+            )
             return short_url
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    
+
+
 @cache(expire=180)
-async def resolves_url(
-    short_url: str,
-    db_cm
-):
+async def resolves_url(short_url: str, db_cm):
     """
     Accept the short url and return the original url
     """
@@ -42,18 +41,15 @@ async def resolves_url(
         url_doc = await db_cm.urls.find_one({"short_url": short_url})
         if not url_doc:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, 
-                detail={"error": f'{short_url} doenot exist in system'}
-                )
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"error": f"{short_url} doenot exist in system"},
+            )
         return url_doc["original_url"]
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-async def url_analytics(
-    short_url: str, 
-    request: Request,
-    db_cm
-):
+
+async def url_analytics(short_url: str, request: Request, db_cm):
     header = request.headers.get("user-agent", "unknown")
     user_ip = request.client.host
     if user_ip == "127.0.0.1":
@@ -64,7 +60,7 @@ async def url_analytics(
     location = None
     try:
         async with httpx.AsyncClient() as client:
-            r = await client.get(IP_DETAILS_URL + f'/{user_ip}')
+            r = await client.get(IP_DETAILS_URL + f"/{user_ip}")
             if r.status_code == 200:
                 data = r.json()
                 city = data.get("city", "")
@@ -84,18 +80,20 @@ async def url_analytics(
         "location": location,
         "utm_source": utm_source,
         "utm_medium": utm_medium,
-        "utm_campaign": utm_campaign
+        "utm_campaign": utm_campaign,
     }
 
     doc = await db_cm.url_analytics.find_one({"short_id": short_url})
 
     if not doc:
-        await db_cm.url_analytics.insert_one({
-            "short_id": short_url,
-            "clicks": 1,
-            "finger_print": [fingerprint],
-            "click_details": [click_info]
-        })
+        await db_cm.url_analytics.insert_one(
+            {
+                "short_id": short_url,
+                "clicks": 1,
+                "finger_print": [fingerprint],
+                "click_details": [click_info],
+            }
+        )
     else:
         if fingerprint not in (doc.get("finger_print") or []):
             await db_cm.url_analytics.update_one(
@@ -103,15 +101,15 @@ async def url_analytics(
                 {
                     "$inc": {"clicks": 1},
                     "$addToSet": {"finger_print": fingerprint},
-                    "$push": {"click_details": click_info}
-                }
+                    "$push": {"click_details": click_info},
+                },
             )
         else:
             pass
 
 
 async def get_url_analytics(
-    short_url: str, 
+    short_url: str,
     db_cm,
     utm_source: str | None = None,
     utm_medium: str | None = None,
@@ -123,7 +121,7 @@ async def get_url_analytics(
         if not analytics_doc:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="Analytics data not found for this short URL"
+                detail="Analytics data not found for this short URL",
             )
 
         filtered_clicks = []
@@ -146,20 +144,17 @@ async def get_url_analytics(
         return analytics_doc
 
 
-
-async def delete_url(
-        short_url:str,
-        db_cm
-):
+async def delete_url(short_url: str, db_cm):
     async with db_cm as db:
-        is_valid = await db.urls.find_one({"short_url":short_url})
+        is_valid = await db.urls.find_one({"short_url": short_url})
         if not is_valid:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Url not found")
-        result = await db.urls.delete_one({"short_url":short_url})
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Url not found"
+            )
+        result = await db.urls.delete_one({"short_url": short_url})
         if result.deleted_count == 0:
             raise HTTPException(
-                status_code= status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Something went wrong"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Something went wrong",
             )
-        return {"message": 'Url data successfully erased'}
-        
+        return {"message": "Url data successfully erased"}

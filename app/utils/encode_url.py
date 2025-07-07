@@ -1,5 +1,5 @@
 """
-Generates a unique short URL ID by converting a MongoDB ObjectId 
+Generates a unique short URL ID by converting a MongoDB ObjectId
 to a compact Base62-encoded string.
 
 Steps:
@@ -12,25 +12,24 @@ The resulting short ID is unique, collision-free, and shorter than
 the original ObjectId representation, suitable for URL shortening.
 """
 
-from  bson import ObjectId
+from bson import ObjectId
+
 from app import settings
+
 
 class ShortIdGenerator:
     @classmethod
-    def encode_base62(cls, num:int) -> str:
+    def encode_base62(cls, num: int) -> str:
         if num == 0:
             return settings.BASE62[0]
         base62 = []
         while num:
             num, rem = divmod(num, 62)
             base62.append(settings.BASE62[rem])
-        return ''.join(reversed(base62))
-    
+        return "".join(reversed(base62))
 
     @classmethod
     def generate(cls):
         obj = ObjectId()
         obj_id_int = int(str(obj), 16)
         return cls.encode_base62(obj_id_int)
-    
-
