@@ -60,14 +60,24 @@ async def redirect_to_original(
 @cache(expire=180)
 async def view_url_analytics(
     short_id: str, 
+    utm_source: str | None = None,
+    utm_medium: str | None = None,
+    utm_campaign: str | None = None,
     db_cm: AsyncIOMotorDatabase = Depends(get_db)
 ):
     """
-    Endpoint that gives the json data related to the Url
+    Endpoint that gives the json data related to the Url, optionally filtered by UTM parameters.
     """
     short_url = LOCAL_HOST + f'/{short_id}'
-    response = await get_url_analytics(short_url=short_url, db_cm=db_cm)
+    response = await get_url_analytics(
+        short_url=short_url, 
+        db_cm=db_cm,
+        utm_source=utm_source,
+        utm_medium=utm_medium,
+        utm_campaign=utm_campaign,
+    )
     return response
+
 
 @router.get("/delete/{short_id}")
 async def delete_content(
