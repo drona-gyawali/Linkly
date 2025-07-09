@@ -116,7 +116,18 @@ http://127.0.0.1:8000/docs#/Url/create_short_url_shorten_post
 
 ### GET `/analytics/{short_id}`
 
-Returns click analytics.
+
+
+Returns click analytics for the given short URL, optionally filtered by UTM parameters.
+
+
+**Query Parameters (optional):**
+
+| Name           | Type   | Description                   |
+| -------------- | ------ | ----------------------------- |
+| `utm_source`   | string | Filter clicks by UTM source   |
+| `utm_medium`   | string | Filter clicks by UTM medium   |
+| `utm_campaign` | string | Filter clicks by UTM campaign |
 
 **Response:**
 
