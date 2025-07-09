@@ -2,21 +2,18 @@
 This module contains APIs used in our product
 """
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+import httpx
+from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
+                     Request, Response, status)
 from fastapi.responses import RedirectResponse
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.database import get_db, get_db_instance
 from app.schemas import UrlRequest, UrlResponse
-from app.services.shortner import (
-    delete_url,
-    get_url_analytics,
-    resolves_url,
-    shorten_url,
-    url_analytics,
-)
-from app.settings import LOCAL_HOST
+from app.services.shortner import (delete_url, get_url_analytics, resolves_url,
+                                   shorten_url, url_analytics)
+from app.settings import LOCAL_HOST, QR_CODE_API
 
 router = APIRouter(tags=["Url"])
 
@@ -86,3 +83,20 @@ async def delete_content(short_id: str, db_cm: AsyncIOMotorDatabase = Depends(ge
     short_url = short_url = LOCAL_HOST + f"/{short_id}"
     _del = await delete_url(short_url=short_url, db_cm=db_cm)
     return _del
+
+
+@router.get("/create-qr-code/{short_id}")
+async def generate_qr(short_id: str):
+    """
+    Endpoint that generates the qr code of the url
+    """
+    short_url = short_url = LOCAL_HOST + f"/{short_id}"
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(QR_CODE_API + short_url)
+            if response.status_code == 200:
+                return Response(content=response.content, media_type="image/png")
+            else:
+                raise Exception(f"Failed to get qr: status-{response.status_code}")
+    except Exception as e:
+        raise Exception(f"QR generation failed: {e}")

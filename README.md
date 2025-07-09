@@ -116,15 +116,7 @@ http://127.0.0.1:8000/docs#/Url/create_short_url_shorten_post
 
 ### GET `/analytics/{short_id}`
 
-Returns click analytics for the given short URL, optionally filtered by UTM parameters.
-
-**Query Parameters (optional):**
-
-| Name           | Type   | Description                   |
-| -------------- | ------ | ----------------------------- |
-| `utm_source`   | string | Filter clicks by UTM source   |
-| `utm_medium`   | string | Filter clicks by UTM medium   |
-| `utm_campaign` | string | Filter clicks by UTM campaign |
+Returns click analytics.
 
 **Response:**
 
@@ -137,15 +129,11 @@ Returns click analytics for the given short URL, optionally filtered by UTM para
       "user_agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0",
       "ip": "8.8.8.8",
       "timestamp": "2025-06-23T09:11:47.636000",
-      "location": "Ashburn, United States",
-      "utm_source": "instagram",
-      "utm_medium": "story",
-      "utm_campaign": "summer_sale"
+      "location": "Ashburn, United States"
     }
   ],
   "clicks": 1
 }
-
 ```
 
 ### DELETE `/delete/{short_id}`
@@ -164,6 +152,37 @@ Deletes all data associated with the given short ID.
 {
   "detail": "Short URL successfully deleted."
 }
+```
+---
+
+### GET `/create-qr-code/{short_id}`
+
+Generates a QR code image for the shortened URL corresponding to the given `short_id`.
+
+**Parameters:**
+
+| Name       | Type  | Description                              |
+| ---------- | ----- | ---------------------------------------- |
+| `short_id` | `str` | Unique identifier for the shortened URL. |
+
+**Response:**
+
+* **Content-Type**: `image/png`
+* **Body**: PNG image of the QR code that encodes the full shortened URL.
+
+**Example:**
+
+Request:
+
+```
+GET /create-qr-code/abc123
+```
+
+Response:
+Returns a PNG image representing:
+
+```
+http://localhost:8000/abc123
 ```
 
 ---
