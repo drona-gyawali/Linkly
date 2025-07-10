@@ -8,10 +8,9 @@ from linkly.settings import DB_NAME, MONGODB_URI
 client = AsyncIOMotorClient(MONGODB_URI)
 
 
-@asynccontextmanager
-async def get_db() -> AsyncGenerator[AsyncIOMotorDatabase | None]:
+async def get_db() -> AsyncGenerator[AsyncIOMotorDatabase , None]:
+    db = client[DB_NAME]
     try:
-        db = client[DB_NAME]
         yield db
     finally:
         # yo motor use garda teardown logic chaina tarapani space xa hai: reason future proof.

@@ -5,32 +5,34 @@ This module contains the service level logic for the api.
 from datetime import datetime, timezone
 
 import httpx
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import HTTPException, Request, status, Depends
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from linkly.database import get_db
 from linkly.settings import IP_DETAILS_URL, LOCAL_HOST
+from linkly.utils.dtype import PyObjectId
 from linkly.utils.encode_url import ShortIdGenerator
 
 
 async def shorten_url(
-    original_url: str, db_cm: AsyncIOMotorDatabase = Depends(get_db)
+    original_url: str,
+    db_cm: AsyncIOMotorDatabase,
+    user_id: PyObjectId | str
 ) -> str:
-    """
-    Take the long url as input and return working short url
-    """
     try:
-        async with db_cm as db:
-            hash = ShortIdGenerator.generate()
-            short_url = LOCAL_HOST + f"/{hash}"
-            await db.urls.insert_one(
-                {"original_url": original_url, "short_url": short_url}
-            )
-            return short_url
+        hash = ShortIdGenerator.generate()
+        short_url = LOCAL_HOST + f"/{hash}"
+        await db_cm.urls.insert_one(
+            {
+                "original_url": original_url,
+                "short_url": short_url,
+                "user_id": PyObjectId(user_id),
+            }
+        )
+        return short_url
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
 
 @cache(expire=180)
 async def resolves_url(short_url: str, db_cm):
@@ -115,46 +117,44 @@ async def get_url_analytics(
     utm_medium: str | None = None,
     utm_campaign: str | None = None,
 ):
-    async with db_cm as db:
-        analytics_doc = await db.url_analytics.find_one({"short_id": short_url})
+    analytics_doc = await db_cm.url_analytics.find_one({"short_id": short_url})
 
-        if not analytics_doc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Analytics data not found for this short URL",
-            )
+    if not analytics_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Analytics data not found for this short URL",
+        )
 
-        filtered_clicks = []
-        for entry in analytics_doc.get("click_details", []):
-            if utm_source and entry.get("utm_source") != utm_source:
-                continue
-            if utm_medium and entry.get("utm_medium") != utm_medium:
-                continue
-            if utm_campaign and entry.get("utm_campaign") != utm_campaign:
-                continue
-            filtered_clicks.append(entry)
+    filtered_clicks = []
+    for entry in analytics_doc.get("click_details", []):
+        if utm_source and entry.get("utm_source") != utm_source:
+            continue
+        if utm_medium and entry.get("utm_medium") != utm_medium:
+            continue
+        if utm_campaign and entry.get("utm_campaign") != utm_campaign:
+            continue
+        filtered_clicks.append(entry)
 
-        analytics_doc["_id"] = str(analytics_doc["_id"])
-        for entry in filtered_clicks:
-            entry["timestamp"] = entry["timestamp"].isoformat()
+    analytics_doc["_id"] = str(analytics_doc["_id"])
+    for entry in filtered_clicks:
+        entry["timestamp"] = entry["timestamp"].isoformat()
 
-        analytics_doc["click_details"] = filtered_clicks
-        analytics_doc["clicks"] = len(filtered_clicks)
+    analytics_doc["click_details"] = filtered_clicks
+    analytics_doc["clicks"] = len(filtered_clicks)
 
-        return analytics_doc
+    return analytics_doc
 
 
 async def delete_url(short_url: str, db_cm):
-    async with db_cm as db:
-        is_valid = await db.urls.find_one({"short_url": short_url})
-        if not is_valid:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Url not found"
-            )
-        result = await db.urls.delete_one({"short_url": short_url})
-        if result.deleted_count == 0:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Something went wrong",
-            )
-        return {"message": "Url data successfully erased"}
+    is_valid = await db_cm.urls.find_one({"short_url": short_url})
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Url not found"
+        )
+    result = await db_cm.urls.delete_one({"short_url": short_url})
+    if result.deleted_count == 0:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Something went wrong",
+        )
+    return {"message": "Url data successfully erased"}

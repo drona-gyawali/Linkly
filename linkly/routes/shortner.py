@@ -11,8 +11,14 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from linkly.database import get_db, get_db_instance
 from linkly.schemas import UrlRequest, UrlResponse
-from linkly.services.shortner import (delete_url, get_url_analytics, resolves_url,
-                                   shorten_url, url_analytics)
+from linkly.services.shortner import (
+    delete_url,
+    get_url_analytics,
+    resolves_url,
+    shorten_url,
+    url_analytics
+)
+from linkly.authentication.jwt.oauth2 import get_current_user
 from linkly.settings import LOCAL_HOST, QR_CODE_API
 
 router = APIRouter(tags=["Url"])
@@ -20,13 +26,12 @@ router = APIRouter(tags=["Url"])
 
 @router.post("/shorten", response_model=UrlResponse)
 async def create_short_url(
-    data: UrlRequest, db: AsyncIOMotorDatabase = Depends(get_db)
+    data: UrlRequest,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    user: dict = Depends(get_current_user),
 ):
-    """
-    Take the data object and return json response.
-    """
-    short = await shorten_url(data.original_url, db)
-    return UrlResponse(original_url=data.original_url, short_url=short)
+    short_url = await shorten_url(data.original_url, db, user["_id"])
+    return UrlResponse(original_url=data.original_url, short_url=short_url)
 
 
 @router.get("/{short_id}")
@@ -59,6 +64,7 @@ async def view_url_analytics(
     utm_source: str | None = None,
     utm_medium: str | None = None,
     utm_campaign: str | None = None,
+    user: dict = Depends(get_current_user),
     db_cm: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """
@@ -80,7 +86,7 @@ async def delete_content(short_id: str, db_cm: AsyncIOMotorDatabase = Depends(ge
     """
     Endpoint that delete the whole data of given short_id
     """
-    short_url = short_url = LOCAL_HOST + f"/{short_id}"
+    short_url = LOCAL_HOST + f"/{short_id}"
     _del = await delete_url(short_url=short_url, db_cm=db_cm)
     return _del
 

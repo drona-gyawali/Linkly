@@ -13,3 +13,7 @@ BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 # keeping secret because of some concern
 IP_DETAILS_URL = os.getenv("IP_DETAILS_URL")
 QR_CODE_API = os.getenv("QR_CODE_API")
+# this is used for jwt auth things
+secret = os.getenv("SECRET_KEY")  
+algorithm  = os.getenv("ALGORITHM")
+acess_token_expiry = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")

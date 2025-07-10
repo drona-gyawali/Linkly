@@ -7,7 +7,7 @@ import redis.asyncio as redis
 from fastapi import HTTPException
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-
+from bson import ObjectId
 from linkly.services import shortner
 from linkly.services.shortner import (
     delete_url,
@@ -93,8 +93,9 @@ def mock_request_with_utm():
 async def test_shorten_url_success(mock_db_cm, mock_db):
     """Test successful URL shortening"""
     mock_db.urls.insert_one = AsyncMock(return_value=None)
+    user_id = str(ObjectId())
 
-    short_url = await shorten_url("https://example.com", db_cm=mock_db_cm)
+    short_url = await shorten_url("https://example.com", db_cm=mock_db_cm, user_id=user_id)
 
     assert short_url.startswith("http://localhost:8000/")
     assert len(short_url.split("/")[-1]) > 0  # Has hash
@@ -102,7 +103,7 @@ async def test_shorten_url_success(mock_db_cm, mock_db):
     mock_db.urls.insert_one.assert_called_once()
     args = mock_db.urls.insert_one.call_args[0][0]
     assert args["original_url"] == "https://example.com"
-    assert args["short_url"] == short_url
+    assert args["user_id"] == ObjectId(user_id)
 
 
 @pytest.mark.asyncio
@@ -110,13 +111,14 @@ async def test_shorten_url_with_complex_url(mock_db_cm, mock_db):
     """Test shortening URL with query parameters and fragments"""
     mock_db.urls.insert_one = AsyncMock(return_value=None)
     complex_url = "https://example.com/path?param1=value1&param2=value2#section"
+    user_id = str(ObjectId())
 
-    short_url = await shorten_url(complex_url, db_cm=mock_db_cm)
+    short_url = await shorten_url(complex_url, db_cm=mock_db_cm, user_id=user_id)
 
     assert short_url.startswith("http://localhost:8000/")
-
     args = mock_db.urls.insert_one.call_args[0][0]
     assert args["original_url"] == complex_url
+    assert args["user_id"] == ObjectId(user_id)
 
 
 @pytest.mark.asyncio
@@ -125,9 +127,10 @@ async def test_shorten_url_database_error(mock_db_cm, mock_db):
     mock_db.urls.insert_one = AsyncMock(
         side_effect=Exception("Database connection error")
     )
+    user_id = str(ObjectId())
 
     with pytest.raises(HTTPException) as exc_info:
-        await shorten_url("https://example.com", db_cm=mock_db_cm)
+        await shorten_url("https://example.com", db_cm=mock_db_cm, user_id=user_id)
 
     assert exc_info.value.status_code == 400
     assert "Database connection error" in str(exc_info.value.detail)
@@ -137,12 +140,13 @@ async def test_shorten_url_database_error(mock_db_cm, mock_db):
 async def test_shorten_url_empty_url(mock_db_cm, mock_db):
     """Test shortening empty URL"""
     mock_db.urls.insert_one = AsyncMock(return_value=None)
+    user_id = str(ObjectId())
 
-    short_url = await shorten_url("", db_cm=mock_db_cm)
+    short_url = await shorten_url("", db_cm=mock_db_cm, user_id=user_id)
 
     args = mock_db.urls.insert_one.call_args[0][0]
     assert args["original_url"] == ""
-
+    assert args["user_id"] == ObjectId(user_id)
 
 # ==================== RESOLVE URL TESTS ====================
 
@@ -695,10 +699,12 @@ async def test_url_analytics_fingerprint_case_sensitivity(mock_db_cm, mock_reque
 async def test_concurrent_url_shortening(mock_db_cm, mock_db):
     """Test multiple concurrent URL shortening requests"""
     import asyncio
-
     mock_db.urls.insert_one = AsyncMock(return_value=None)
-
     urls = ["https://example1.com", "https://example2.com", "https://example3.com"]
+    user_id = str(ObjectId())
 
-    tasks = [shorten_url(url, db_cm=mock_db_cm) for url in urls]
+    tasks = [shorten_url(url, db_cm=mock_db_cm, user_id=user_id) for url in urls]
     results = await asyncio.gather(*tasks)
+
+    for short_url in results:
+        assert short_url.startswith("http://localhost:8000/")
