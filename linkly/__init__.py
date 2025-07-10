@@ -13,7 +13,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-from app.routes import shortner
+from linkly.routes import shortner
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(shortner.router)

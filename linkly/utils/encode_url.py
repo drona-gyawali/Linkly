@@ -14,7 +14,7 @@ the original ObjectId representation, suitable for URL shortening.
 
 from bson import ObjectId
 
-from app import settings
+from linkly import settings
 
 
 class ShortIdGenerator:

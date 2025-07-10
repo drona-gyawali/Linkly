@@ -9,11 +9,11 @@ from fastapi.responses import RedirectResponse
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.database import get_db, get_db_instance
-from app.schemas import UrlRequest, UrlResponse
-from app.services.shortner import (delete_url, get_url_analytics, resolves_url,
+from linkly.database import get_db, get_db_instance
+from linkly.schemas import UrlRequest, UrlResponse
+from linkly.services.shortner import (delete_url, get_url_analytics, resolves_url,
                                    shorten_url, url_analytics)
-from app.settings import LOCAL_HOST, QR_CODE_API
+from linkly.settings import LOCAL_HOST, QR_CODE_API
 
 router = APIRouter(tags=["Url"])
 

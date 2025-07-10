@@ -9,9 +9,9 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.database import get_db
-from app.settings import IP_DETAILS_URL, LOCAL_HOST
-from app.utils.encode_url import ShortIdGenerator
+from linkly.database import get_db
+from linkly.settings import IP_DETAILS_URL, LOCAL_HOST
+from linkly.utils.encode_url import ShortIdGenerator
 
 
 async def shorten_url(

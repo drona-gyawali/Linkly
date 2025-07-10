@@ -1,4 +1,4 @@
-from app import app
+from linkly import app
 
 # from fastapi import FastAPI
 # from app.routes import shortner

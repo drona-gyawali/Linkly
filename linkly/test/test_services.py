@@ -8,8 +8,8 @@ from fastapi import HTTPException
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 
-from app.services import shortner
-from app.services.shortner import (
+from linkly.services import shortner
+from linkly.services.shortner import (
     delete_url,
     get_url_analytics,
     resolves_url,
@@ -226,7 +226,7 @@ async def test_resolves_url_database_error(mock_db_cm, mock_db):
 #     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=existing_doc)
 #     mock_db_cm.url_analytics.update_one = AsyncMock(return_value=None)
 
-#     with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+#     with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
 #         mock_response = MagicMock()
 #         mock_response.status_code = 200
 #         mock_response.json.return_value = {"city": "Tokyo", "country": "Japan"}
@@ -272,7 +272,7 @@ async def test_url_analytics_with_utm_parameters(mock_db_cm, mock_request_with_u
     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
     mock_db_cm.url_analytics.insert_one = AsyncMock(return_value=None)
 
-    with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+    with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"city": "Mumbai", "country": "India"}
@@ -298,7 +298,7 @@ async def test_url_analytics_ip_api_failure(mock_db_cm, mock_request):
     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
     mock_db_cm.url_analytics.insert_one = AsyncMock(return_value=None)
 
-    with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+    with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
         mock_client.return_value.__aenter__.return_value.get = AsyncMock(
             side_effect=Exception("API failed")
         )
@@ -315,7 +315,7 @@ async def test_url_analytics_ip_api_non_200_response(mock_db_cm, mock_request):
     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
     mock_db_cm.url_analytics.insert_one = AsyncMock(return_value=None)
 
-    with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+    with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
         mock_response = MagicMock()
         mock_response.status_code = 500
         mock_client.return_value.__aenter__.return_value.get = AsyncMock(
@@ -334,7 +334,7 @@ async def test_url_analytics_missing_location_data(mock_db_cm, mock_request):
     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
     mock_db_cm.url_analytics.insert_one = AsyncMock(return_value=None)
 
-    with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+    with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"city": "", "country": ""}
@@ -591,7 +591,7 @@ async def test_url_analytics_with_special_characters_in_user_agent(mock_db_cm):
     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
     mock_db_cm.url_analytics.insert_one = AsyncMock(return_value=None)
 
-    with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+    with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"city": "Berlin", "country": "Germany"}
@@ -619,7 +619,7 @@ async def test_url_analytics_with_missing_user_agent(mock_db_cm):
     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
     mock_db_cm.url_analytics.insert_one = AsyncMock(return_value=None)
 
-    with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+    with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"city": "Paris", "country": "France"}
@@ -675,7 +675,7 @@ async def test_url_analytics_fingerprint_case_sensitivity(mock_db_cm, mock_reque
     mock_db_cm.url_analytics.find_one = AsyncMock(return_value=None)
     mock_db_cm.url_analytics.insert_one = AsyncMock(return_value=None)
 
-    with patch("app.services.shortner.httpx.AsyncClient") as mock_client:
+    with patch("linkly.services.shortner.httpx.AsyncClient") as mock_client:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {"city": "Sydney", "country": "Australia"}

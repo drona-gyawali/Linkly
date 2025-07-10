@@ -1,7 +1,7 @@
 # yo chai script ho just check garna ko lagi ki hamro db chaliraxa kinai vanerw
 import asyncio
 
-from app.database import get_db
+from linkly.database import get_db
 
 
 async def main():

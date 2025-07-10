@@ -8,7 +8,7 @@ from typing import List, Optional
 from bson import ObjectId
 from pydantic import BaseModel, Field
 
-from app.utils.dtype import PyObjectId
+from linkly.utils.dtype import PyObjectId
 
 
 class UrlDbObject(BaseModel):

@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
-from app.settings import DB_NAME, MONGODB_URI
+from linkly.settings import DB_NAME, MONGODB_URI
 
 client = AsyncIOMotorClient(MONGODB_URI)
 
