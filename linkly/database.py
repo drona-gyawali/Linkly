@@ -8,7 +8,7 @@ from linkly.settings import DB_NAME, MONGODB_URI
 client = AsyncIOMotorClient(MONGODB_URI)
 
 
-async def get_db() -> AsyncGenerator[AsyncIOMotorDatabase , None]:
+async def get_db() -> AsyncGenerator[AsyncIOMotorDatabase, None]:
     db = client[DB_NAME]
     try:
         yield db

@@ -5,7 +5,7 @@ This module contains the service level logic for the api.
 from datetime import datetime, timezone
 
 import httpx
-from fastapi import HTTPException, Request, status, Depends
+from fastapi import Depends, HTTPException, Request, status
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -16,9 +16,7 @@ from linkly.utils.encode_url import ShortIdGenerator
 
 
 async def shorten_url(
-    original_url: str,
-    db_cm: AsyncIOMotorDatabase,
-    user_id: PyObjectId | str
+    original_url: str, db_cm: AsyncIOMotorDatabase, user_id: PyObjectId | str
 ) -> str:
     try:
         hash = ShortIdGenerator.generate()
@@ -33,6 +31,7 @@ async def shorten_url(
         return short_url
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
 
 @cache(expire=180)
 async def resolves_url(short_url: str, db_cm):

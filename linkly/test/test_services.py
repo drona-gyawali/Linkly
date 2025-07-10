@@ -4,10 +4,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 import pytest_asyncio
 import redis.asyncio as redis
+from bson import ObjectId
 from fastapi import HTTPException
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from bson import ObjectId
+
 from linkly.services import shortner
 from linkly.services.shortner import (
     delete_url,
@@ -95,7 +96,9 @@ async def test_shorten_url_success(mock_db_cm, mock_db):
     mock_db.urls.insert_one = AsyncMock(return_value=None)
     user_id = str(ObjectId())
 
-    short_url = await shorten_url("https://example.com", db_cm=mock_db_cm, user_id=user_id)
+    short_url = await shorten_url(
+        "https://example.com", db_cm=mock_db_cm, user_id=user_id
+    )
 
     assert short_url.startswith("http://localhost:8000/")
     assert len(short_url.split("/")[-1]) > 0  # Has hash
@@ -147,6 +150,7 @@ async def test_shorten_url_empty_url(mock_db_cm, mock_db):
     args = mock_db.urls.insert_one.call_args[0][0]
     assert args["original_url"] == ""
     assert args["user_id"] == ObjectId(user_id)
+
 
 # ==================== RESOLVE URL TESTS ====================
 
@@ -699,6 +703,7 @@ async def test_url_analytics_fingerprint_case_sensitivity(mock_db_cm, mock_reque
 async def test_concurrent_url_shortening(mock_db_cm, mock_db):
     """Test multiple concurrent URL shortening requests"""
     import asyncio
+
     mock_db.urls.insert_one = AsyncMock(return_value=None)
     urls = ["https://example1.com", "https://example2.com", "https://example3.com"]
     user_id = str(ObjectId())

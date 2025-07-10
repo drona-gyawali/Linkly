@@ -1,9 +1,11 @@
-from motor.motor_asyncio import AsyncIOMotorDatabase
-from linkly.utils.dtype import MongoUser
 from bson import ObjectId
+from motor.motor_asyncio import AsyncIOMotorDatabase
 from passlib.context import CryptContext
 
+from linkly.utils.dtype import MongoUser
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class UserRepository:
     def __init__(self, db: AsyncIOMotorDatabase):

@@ -15,7 +15,7 @@ class UrlDbObject(BaseModel):
     id: PyObjectId = Field(alias="_id", default_factory=PyObjectId)
     original_url: str
     short_id: str
-    user_id:  Optional[PyObjectId] = None
+    user_id: Optional[PyObjectId] = None
 
     class Config:
         arbitrary_types_allowed = True

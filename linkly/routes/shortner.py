@@ -3,12 +3,20 @@ This module contains APIs used in our product
 """
 
 import httpx
-from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
-                     Request, Response, status)
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    HTTPException,
+    Request,
+    Response,
+    status,
+)
 from fastapi.responses import RedirectResponse
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from linkly.authentication.jwt.oauth2 import get_current_user
 from linkly.database import get_db, get_db_instance
 from linkly.schemas import UrlRequest, UrlResponse
 from linkly.services.shortner import (
@@ -16,9 +24,8 @@ from linkly.services.shortner import (
     get_url_analytics,
     resolves_url,
     shorten_url,
-    url_analytics
+    url_analytics,
 )
-from linkly.authentication.jwt.oauth2 import get_current_user
 from linkly.settings import LOCAL_HOST, QR_CODE_API
 
 router = APIRouter(tags=["Url"])
