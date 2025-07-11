@@ -2,6 +2,8 @@
 This module contains APIs used in our product
 """
 
+from typing import Optional
+
 import httpx
 from fastapi import (
     APIRouter,
@@ -33,11 +35,23 @@ router = APIRouter(tags=["Url"])
 
 @router.post("/shorten", response_model=UrlResponse)
 async def create_short_url(
+    request: Request,
     data: UrlRequest,
     db: AsyncIOMotorDatabase = Depends(get_db),
-    user: dict = Depends(get_current_user),
 ):
-    short_url = await shorten_url(data.original_url, db, user["_id"])
+    user: Optional[dict] = None
+    token = request.headers.get("authorization")
+
+    if token and token.startswith("Bearer "):
+        token = token.split("Bearer ")[1]
+        try:
+            user = await get_current_user(token=token, db=db)
+        except Exception:
+            user = None
+
+    user_id = user["_id"] if user else None
+
+    short_url = await shorten_url(data.original_url, db, user_id)
     return UrlResponse(original_url=data.original_url, short_url=short_url)
 
 
