@@ -28,7 +28,7 @@ from linkly.services.shortner import (
     shorten_url,
     url_analytics,
 )
-from linkly.settings import LOCAL_HOST, QR_CODE_API
+from linkly.settings import settings
 
 router = APIRouter(tags=["Url"])
 
@@ -51,8 +51,10 @@ async def create_short_url(
 
     user_id = user["_id"] if user else None
 
-    short_url = await shorten_url(data.original_url, db, user_id)
-    return UrlResponse(original_url=data.original_url, short_url=short_url)
+    short_url = await shorten_url(data.original_url, db, user_id, data.expiry)
+    return UrlResponse(
+        original_url=data.original_url, short_url=short_url, expiry=data.expiry
+    )
 
 
 @router.get("/{short_id}")
@@ -67,7 +69,7 @@ async def redirect_to_original(
     Also track analytics in background
     """
     try:
-        short_url = LOCAL_HOST + f"/{short_id}"
+        short_url = settings.LOCAL_HOST + f"/{short_id}"
         original_url = await resolves_url(short_url, db)
         background_tasks.add_task(url_analytics, short_url, request, get_db_instance())
         return RedirectResponse(url=original_url)
@@ -91,7 +93,7 @@ async def view_url_analytics(
     """
     Endpoint that gives the json data related to the Url, optionally filtered by UTM parameters.
     """
-    short_url = LOCAL_HOST + f"/{short_id}"
+    short_url = settings.LOCAL_HOST + f"/{short_id}"
     response = await get_url_analytics(
         short_url=short_url,
         db_cm=db_cm,
@@ -107,7 +109,7 @@ async def delete_content(short_id: str, db_cm: AsyncIOMotorDatabase = Depends(ge
     """
     Endpoint that delete the whole data of given short_id
     """
-    short_url = LOCAL_HOST + f"/{short_id}"
+    short_url = settings.LOCAL_HOST + f"/{short_id}"
     _del = await delete_url(short_url=short_url, db_cm=db_cm)
     return _del
 
@@ -117,10 +119,10 @@ async def generate_qr(short_id: str):
     """
     Endpoint that generates the qr code of the url
     """
-    short_url = short_url = LOCAL_HOST + f"/{short_id}"
+    short_url = short_url = settings.LOCAL_HOST + f"/{short_id}"
     try:
         async with httpx.AsyncClient() as client:
-            response = await client.get(QR_CODE_API + short_url)
+            response = await client.get(settings.QR_CODE_API + short_url)
             if response.status_code == 200:
                 return Response(content=response.content, media_type="image/png")
             else:

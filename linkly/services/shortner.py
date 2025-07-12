@@ -5,29 +5,44 @@ This module contains the service level logic for the api.
 from datetime import datetime, timezone
 
 import httpx
+import redis.asyncio as redis
 from fastapi import Depends, HTTPException, Request, status
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from linkly.database import get_db
-from linkly.settings import IP_DETAILS_URL, LOCAL_HOST
+from linkly.settings import settings
 from linkly.utils.dtype import PyObjectId
 from linkly.utils.encode_url import ShortIdGenerator
 
+redis_client = redis.from_url("redis://localhost")
+
 
 async def shorten_url(
-    original_url: str, db_cm: AsyncIOMotorDatabase, user_id: PyObjectId | str
+    original_url: str,
+    db_cm: AsyncIOMotorDatabase,
+    user_id: PyObjectId | str,
+    expiry: int | None = None,
 ) -> str:
     try:
-        hash = ShortIdGenerator.generate()
-        short_url = LOCAL_HOST + f"/{hash}"
+        short_id = ShortIdGenerator.generate()
+        short_url = settings.LOCAL_HOST + f"/{short_id}"
+        created_at = datetime.utcnow()
+
         await db_cm.urls.insert_one(
             {
                 "original_url": original_url,
+                "short_id": short_id,
                 "short_url": short_url,
                 "user_id": PyObjectId(user_id),
+                "created_at": created_at,
+                "expiry": expiry,
             }
         )
+
+        if expiry:
+            await redis_client.set(f"expire:{short_id}", "1", ex=expiry)
+
         return short_url
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -61,7 +76,7 @@ async def url_analytics(short_url: str, request: Request, db_cm):
     location = None
     try:
         async with httpx.AsyncClient() as client:
-            r = await client.get(IP_DETAILS_URL + f"/{user_ip}")
+            r = await client.get(settings.IP_DETAILS_URL + f"/{user_ip}")
             if r.status_code == 200:
                 data = r.json()
                 city = data.get("city", "")

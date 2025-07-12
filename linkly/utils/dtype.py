@@ -9,6 +9,8 @@ Pydantic model configuration to support custom data types.
 kindly visit for more information: https://www.mongodb.com/developer/languages/python/python-quickstart-fastapi/#database-models
 """
 
+from typing import Optional
+
 from bson import ObjectId
 from pydantic import BaseModel, EmailStr, Field
 
@@ -35,7 +37,8 @@ class MongoUser(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     name: str
     email: EmailStr
-    password: str
+    password: Optional[str] = None
+    oauth: bool = False
 
     class Config:
         arbitrary_types_allowed = True

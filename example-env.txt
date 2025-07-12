@@ -1,9 +1,28 @@
-# .env file contents
-LOCAL_HOST="https://example.com" // You can add your own domain name
-MONGODB_URI="mongodb://localhost:27017" // db host 
-DB_NAME="xxxxxx"
-IP_DETAILS_URL="http://ip-api.com/json" 
+LOCAL_HOST="http://localhost:8000"
+
+# DB credentials 
+MONGODB_URI="mongodb://localhost:27017"
+DB_NAME="url_shortener"
+
+# External API Link
+IP_DETAILS_URL="http://ip-api.com/json"
 QR_CODE_API="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+
+# Jwt credentials
+SECRET_KEY = "xxxxxxxxxxxxxxxxxxx"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Unique url identifer helper key
+BASE62 = "xxxxxxx"
+
+# Middleware key
+SESSION_SECRET="2xxxxxxxb"
+
+# Google Oauth
+GOOGLE_CLIENT_ID="9xxxxxxom"
+GOOGLE_CLIENT_SECRET="GCSxxxxxxxxxxxxxxxaDq1"
+
+# GitHub Oauth
+GITHUB_CLIENT_ID="OxxxxxxxxxsTL2"
+GITHUB_CLIENT_SECRET="72xxxxxxxxxxx1a0d"

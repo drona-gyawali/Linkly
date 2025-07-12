@@ -16,6 +16,8 @@ class UrlDbObject(BaseModel):
     original_url: str
     short_id: str
     user_id: Optional[PyObjectId] = None
+    created_at: int
+    expiry: Optional[int] = None
 
     class Config:
         arbitrary_types_allowed = True

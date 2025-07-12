@@ -4,8 +4,8 @@ import jwt
 from fastapi import HTTPException, status
 from jwt.exceptions import InvalidTokenError
 
-from linkly import settings
 from linkly.models.users import TokenData
+from linkly.settings import settings
 
 SECRET_KEY = settings.secret
 ALGORITHM = settings.algorithm
