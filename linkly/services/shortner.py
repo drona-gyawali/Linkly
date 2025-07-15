@@ -70,6 +70,7 @@ async def resolves_url(short_url: str, db_cm):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
+# TODO: somethiing is off need to rewrite whole anaytics logic
 async def url_analytics(short_url: str, request: Request, db_cm):
     header = request.headers.get("user-agent", "unknown")
     user_ip = request.client.host
