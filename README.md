@@ -16,7 +16,14 @@
 
 ---
 
-> ⚠️ **Note**: Frontend is **not yet added**. However, the backend API is fully functional and tested.
+> ⚡️ **Frontend:** Built with **raw HTML, CSS, and JavaScript** as a fully functional working prototype.
+> 🛠 **Just run the HTML along with the backend to see the magic happen!**
+> 
+> <b>FrontPage</b>
+> <img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/6fc904ec-e131-47c1-9f4e-4b97d6c26bdc" />
+
+> <b>Dashboard</b>
+> <img width="1366" height="768" alt="image" src="https://raw.githubusercontent.com/drona-gyawali/My-Github-Assest/refs/heads/main/dumps/dashboard.png" />
 
 ---
 
