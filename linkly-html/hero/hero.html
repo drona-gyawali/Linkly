@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linkly - Premium URL Shortener</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="text-white min-h-screen relative overflow-x-hidden">
+  <!-- Floating Orbs -->
+  <div class="floating-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="glass-card sticky top-0 z-50 border-b border-opacity-10">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 feature-icon rounded-2xl flex items-center justify-center">
+              <i class="fas fa-link text-white text-lg"></i>
+            </div>
+            <span class="text-2xl font-bold gradient-text-premium">
+              Linkly
+            </span>
+          </div>
+        </div>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#home"
+            class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 font-medium">Home</a>
+          <a href="#analytics"
+            class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 font-medium">Analytics</a>
+          <a href="#features"
+            class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 font-medium">Features</a>
+          <!-- <a href="#pricing"
+            class="text-gray-300 hover:text-white transition-all duration-300 hover:scale-105 font-medium">Pricing</a> -->
+        </div>
+
+        <!-- Auth Buttons -->
+        <div class="hidden md:flex items-center space-x-4">
+          <button class="px-6 py-3 text-gray-300 hover:text-white transition-all duration-300 font-medium">
+            <a href="/login/login.html">Sign In</a>
+          </button>
+          <button class="px-8 py-3 premium-button text-white rounded-2xl font-semibold shadow-lg" id="get-started">
+            Get Started
+          </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden p-3 glass-card-dark rounded-xl hover:bg-opacity-30 transition-all duration-300"
+          onclick="toggleMobileMenu()">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <div id="mobileMenu" class="md:hidden hidden py-6 border-t border-white border-opacity-10">
+        <div class="flex flex-col space-y-4">
+          <a href="#home" class="text-gray-300 hover:text-white transition-all duration-300 py-3 font-medium">Home</a>
+          <a href="#analytics"
+            class="text-gray-300 hover:text-white transition-all duration-300 py-3 font-medium">Analytics</a>
+          <a href="#features"
+            class="text-gray-300 hover:text-white transition-all duration-300 py-3 font-medium">Features</a>
+          <!-- <a href="#pricing"
+            class="text-gray-300 hover:text-white transition-all duration-300 py-3 font-medium">Pricing</a> -->
+          <hr class="border-white border-opacity-10" />
+          <button class="text-left text-gray-300 hover:text-white transition-all duration-300 py-3 font-medium">
+            Sign In
+          </button>
+          <button class="premium-button text-white rounded-2xl px-6 py-3 font-semibold">
+            Get Started
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="py-24 px-6 lg:px-8 relative z-10" id="home">
+    <div class="max-w-6xl mx-auto text-center">
+      <h1 class="text-6xl md:text-8xl font-black mb-8 gradient-text-premium leading-tight">
+        Shorten URLs with
+        <br />
+        <span class="gradient-text">Premium Style</span>
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-300 mb-16 max-w-3xl mx-auto leading-relaxed">
+        Transform your long URLs into beautiful, trackable short links with
+        advanced analytics, premium features, and enterprise-grade security.
+      </p>
+
+      <!-- Trust Indicators -->
+      <div class="flex flex-wrap justify-center items-center gap-8 mb-16 opacity-60">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-shield-alt text-green-400"></i>
+          <span class="text-sm font-medium">SSL Secured</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-chart-line text-blue-400"></i>
+          <span class="text-sm font-medium">Real-time Analytics</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-users text-purple-400"></i>
+          <span class="text-sm font-medium">10M+ Links Created</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- URL Shortener Card -->
+  <section class="px-6 lg:px-8 pb-24 relative z-10">
+    <div class="max-w-5xl mx-auto">
+      <div class="glass-card rounded-3xl p-8 md:p-12 shadow-2xl">
+        <div class="space-y-8">
+          <!-- Input Section -->
+          <div class="space-y-6">
+            <div class="input-focus">
+              <label class="block text-lg font-semibold text-gray-200 mb-4">
+                <i class="fas fa-link gradient-text mr-3"></i>
+                Enter your long URL
+              </label>
+              <input type="url" placeholder="https://example.com/your-incredibly-long-url-that-needs-shortening"
+                class="w-full px-8 py-6 glass-card-dark rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 text-lg font-medium"
+                id="urlInput" />
+            </div>
+
+            <!-- Advanced Options -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="input-focus">
+                <label class="block text-sm font-semibold text-gray-300 mb-3">
+                  <i class="fas fa-edit text-purple-400 mr-2"></i>
+                  Custom Alias
+                </label>
+                <input type="text" placeholder="my-awesome-link"
+                  class="w-full px-6 py-4 glass-card-dark rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 font-medium"
+                  id="customAlias" />
+              </div>
+              <div class="input-focus">
+                <label class="block text-sm font-semibold text-gray-300 mb-3">
+                  <i class="fas fa-clock text-blue-400 mr-2"></i>
+                  Expiration
+                </label>
+                <select
+                  id="expireSelect"
+                  class="w-full px-6 py-4 glass-card-dark rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 font-medium">
+                  <option value="">Never expires</option>
+                  <option value="1h">1 Hour</option>
+                  <option value="1d">1 Day</option>
+                  <option value="1w">1 Week</option>
+                  <option value="1m">1 Month</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button
+            class="w-full premium-button text-white py-6 px-8 rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center space-x-4 group"
+            onclick="createShortLink()">
+            <i class="fas fa-magic group-hover:animate-spin transition-all duration-300"></i>
+            <span>Create Premium Short Link</span>
+            <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Result Section -->
+  <section class="px-6 lg:px-8 pb-24 relative z-10">
+    <div class="max-w-5xl mx-auto">
+      <div class="glass-card rounded-3xl p-8 md:p-12 shadow-2xl hidden" id="resultSection">
+        <div class="text-center mb-12">
+          <div
+            class="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <i class="fas fa-check text-3xl text-white"></i>
+          </div>
+          <h3 class="text-3xl font-bold text-white mb-4">
+            Your premium link is ready!
+          </h3>
+          <p class="text-gray-300 text-lg">
+            Share it anywhere and track its performance
+          </p>
+        </div>
+
+        <div class="space-y-8">
+          <!-- Short URL Display -->
+          <div class="glass-card-dark rounded-2xl p-8 border border-purple-500 border-opacity-30 neon-glow">
+            <div class="flex items-center justify-between mb-6">
+              <span class="text-sm font-bold text-gray-400 tracking-wider">YOUR SHORT URL</span>
+              <div class="flex items-center space-x-3">
+                <button
+                  class="px-6 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-300 flex items-center space-x-2 font-semibold shadow-lg"
+                  onclick="copyToClipboard()">
+                  <i class="fas fa-copy"></i>
+                  <span>Copy</span>
+                </button>
+                <button
+                  class="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-xl hover:from-pink-600 hover:to-pink-700 transition-all duration-300 flex items-center space-x-2 font-semibold shadow-lg" "
+                    id="generate-qr">
+                  <i class="fas fa-qrcode"></i>
+                  <span>QR Code</span>
+                </button>
+              </div>
+            </div>
+            <div
+              class="text-2xl font-mono text-white glass-card-dark p-6 rounded-xl bg-gradient-to-r from-purple-900 to-blue-900 bg-opacity-20"
+              id="shortUrl">
+              https://linkly.pro/premium123
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="stats-card rounded-2xl p-6 text-center backdrop-blur-lg">
+              <div class="text-3xl font-bold gradient-text mb-2">0</div>
+              <div class="text-sm text-gray-400 font-medium">
+                Total Clicks
+              </div>
+            </div>
+            <div class="stats-card rounded-2xl p-6 text-center backdrop-blur-lg">
+              <div class="text-3xl font-bold text-emerald-400 mb-2">
+                Active
+              </div>
+              <div class="text-sm text-gray-400 font-medium">Link Status</div>
+            </div>
+            <div class="stats-card rounded-2xl p-6 text-center backdrop-blur-lg">
+              <div class="text-3xl font-bold text-blue-400 mb-2" id="expiry-details">∞</div>
+              <div class="text-sm text-gray-400 font-medium">Expires</div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col md:flex-row gap-4">
+            <button
+              class="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-purple-600 hover:to-purple-700 transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg">
+              <i class="fas fa-chart-line"></i>
+              <span>View Analytics</span>
+            </button>
+            <button
+              class="flex-1 glass-card-dark text-white py-4 px-6 rounded-xl font-semibold hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center space-x-3"
+              id="share-btn">
+              <i class="fas fa-share-alt"></i>
+              <span>Share Link</span>
+            </button>
+            <button
+              class="md:w-auto bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg"
+              id="delete">
+              <i class="fas fa-trash"></i>
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Fake short URL display -->
+<div id="shortUrl" class="hidden">https://linkly.pro/premium123</div>
+  <!-- Analytics Section -->
+  <section id="analytics" class="px-6 lg:px-8 py-24 relative z-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-20">
+        <h2 class="text-5xl md:text-6xl font-black mb-8 gradient-text-premium">
+          Advanced Analytics
+        </h2>
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          Get detailed insights into your link performance with real-time
+          analytics, geographic data, and user behavior tracking.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <!-- Analytics Dashboard -->
+        <div class="glass-card rounded-3xl p-8 card-hover">
+          <h3 class="text-2xl font-bold mb-8 text-white flex items-center">
+            <i class="fas fa-chart-bar gradient-text mr-4 text-2xl"></i>
+            Click Analytics
+          </h3>
+          <div class="space-y-8">
+            <div class="grid grid-cols-2 gap-6">
+              <div class="stats-card rounded-2xl p-6 text-center">
+                <div class="text-4xl font-bold gradient-text mb-2">1,234</div>
+                <div class="text-sm text-gray-400 font-medium">
+                  Total Clicks
+                </div>
+              </div>
+              <div class="stats-card rounded-2xl p-6 text-center">
+                <div class="text-4xl font-bold text-emerald-400 mb-2">89</div>
+                <div class="text-sm text-gray-400 font-medium">Today</div>
+              </div>
+            </div>
+            <div class="h-64 glass-card-dark rounded-2xl flex items-center justify-center">
+              <div class="text-center text-gray-400">
+                <i class="fas fa-chart-line text-6xl mb-6 gradient-text"></i>
+                <p class="text-lg font-medium">Interactive Chart</p>
+                <p class="text-sm opacity-60">Real-time data visualization</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Geographic Data -->
+        <div class="glass-card rounded-3xl p-8 card-hover">
+          <h3 class="text-2xl font-bold mb-8 text-white flex items-center">
+            <i class="fas fa-globe gradient-text mr-4 text-2xl"></i>
+            Geographic Data
+          </h3>
+          <div class="space-y-4">
+            <div
+              class="flex items-center justify-between p-6 glass-card-dark rounded-xl hover:bg-opacity-30 transition-all duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full shadow-lg"></div>
+                <span class="text-white font-medium">United States</span>
+              </div>
+              <span class="text-blue-400 font-bold text-lg">45%</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-6 glass-card-dark rounded-xl hover:bg-opacity-30 transition-all duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-green-600 rounded-full shadow-lg"></div>
+                <span class="text-white font-medium">United Kingdom</span>
+              </div>
+              <span class="text-green-400 font-bold text-lg">23%</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-6 glass-card-dark rounded-xl hover:bg-opacity-30 transition-all duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full shadow-lg"></div>
+                <span class="text-white font-medium">Canada</span>
+              </div>
+              <span class="text-purple-400 font-bold text-lg">18%</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-6 glass-card-dark rounded-xl hover:bg-opacity-30 transition-all duration-300">
+              <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full shadow-lg"></div>
+                <span class="text-white font-medium">Australia</span>
+              </div>
+              <span class="text-yellow-400 font-bold text-lg">14%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="px-6 lg:px-8 py-24 relative z-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-20">
+        <h2 class="text-5xl md:text-6xl font-black mb-8 gradient-text-premium">
+          Premium Features
+        </h2>
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          Everything you need to manage and track your links professionally
+          with enterprise-grade features and premium support.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature Cards -->
+        <div class="glass-card rounded-3xl p-8 card-hover ripple">
+          <div class="w-16 h-16 feature-icon rounded-2xl flex items-center justify-center mb-8">
+            <i class="fas fa-qrcode text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">QR Code Generator</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Generate beautiful QR codes for your short links with custom styling and branding options.
+          </p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 card-hover ripple">
+          <div class="w-16 h-16 feature-icon rounded-2xl flex items-center justify-center mb-8">
+            <i class="fas fa-chart-line text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">Real-time Analytics</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Track clicks, geographic data, referrers, and user behavior with advanced real-time analytics.
+          </p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 card-hover ripple">
+          <div class="w-16 h-16 feature-icon rounded-2xl flex items-center justify-center mb-8">
+            <i class="fas fa-shield-alt text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">Advanced Security</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Password protection, expiration dates, and SSL encryption to keep your links secure.
+          </p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 card-hover ripple">
+          <div class="w-16 h-16 feature-icon rounded-2xl flex items-center justify-center mb-8">
+            <i class="fas fa-palette text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">Custom Branding</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Customize your short links with your own domain, logos, and branded landing pages.
+          </p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 card-hover ripple">
+          <div class="w-16 h-16 feature-icon rounded-2xl flex items-center justify-center mb-8">
+            <i class="fas fa-code  text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">Developer API</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Integrate with your applications using our powerful REST API with comprehensive documentation.
+          </p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 card-hover ripple">
+          <div class="w-16 h-16 feature-icon rounded-2xl flex items-center justify-center mb-8">
+            <i class="fas fa-users text-white text-2xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold text-white mb-4">Team Management</h3>
+          <p class="text-gray-300 leading-relaxed">
+            Collaborate with your team, assign roles, and manage permissions for enterprise workflows.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section
+    <section id="pricing" class="px-6 lg:px-8 py-24 relative z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20">
+                <h2 class="text-5xl md:text-6xl font-black mb-8 gradient-text-premium">
+                    Choose Your Plan
+                </h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                    Start for free or unlock premium features with our professional and enterprise plans.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                Free Plan
+                <div class="pricing-card rounded-3xl p-8 relative">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-4">Free</h3>
+                        <div class="text-5xl font-black gradient-text mb-2">$0</div>
+                        <div class="text-gray-400 text-sm">Forever free</div>
+                    </div>
+                    <ul class="space-y-4 mb-12">
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Up to 100 links/month</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Basic analytics</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">QR code generation</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-times text-red-400"></i>
+                            <span class="text-gray-500">Custom domains</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-times text-red-400"></i>
+                            <span class="text-gray-500">Team collaboration</span>
+                        </li>
+                    </ul>
+                    <button class="w-full glass-card-dark text-white py-4 px-6 rounded-xl font-semibold hover:bg-opacity-30 transition-all duration-300">
+                        Get Started Free
+                    </button>
+                </div>
+                
+                Pro Plan
+                <div class="pricing-card featured rounded-3xl p-8 relative">
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                        Most Popular
+                    </div>
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-4">Pro</h3>
+                        <div class="text-5xl font-black gradient-text mb-2">$29</div>
+                        <div class="text-gray-400 text-sm">Per month</div>
+                    </div>
+                    <ul class="space-y-4 mb-12">
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Unlimited links</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Advanced analytics</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Custom domains</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Password protection</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">API access</span>
+                        </li>
+                    </ul>
+                    <button class="w-full premium-button text-white py-4 px-6 rounded-xl font-semibold">
+                        Upgrade to Pro
+                    </button>
+                </div>
+                
+                Enterprise Plan
+                <div class="pricing-card rounded-3xl p-8 relative">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-4">Enterprise</h3>
+                        <div class="text-5xl font-black gradient-text mb-2">$99</div>
+                        <div class="text-gray-400 text-sm">Per month</div>
+                    </div>
+                    <ul class="space-y-4 mb-12">
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Everything in Pro</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Team management</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Priority support</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">Custom integrations</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-green-400"></i>
+                            <span class="text-gray-300">SLA guarantee</span>
+                        </li>
+                    </ul>
+                    <button class="w-full glass-card-dark text-white py-4 px-6 rounded-xl font-semibold hover:bg-opacity-30 transition-all duration-300">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+  <!-- Footer -->
+  <footer class="px-6 lg:px-8 py-16 border-t border-white border-opacity-10 relative z-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="md:col-span-2">
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-12 h-12 feature-icon rounded-2xl flex items-center justify-center">
+              <i class="fas fa-link text-white text-lg"></i>
+            </div>
+            <span class="text-2xl font-bold gradient-text-premium">Linkly</span>
+          </div>
+          <p class="text-gray-300 leading-relaxed max-w-lg">
+            The premium URL shortener for professionals and enterprises.
+            Create beautiful, trackable short links with advanced analytics.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-lg font-semibold text-white mb-6">Product</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Features</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Pricing</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">API</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Analytics</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-lg font-semibold text-white mb-6">Support</h4>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Help Center</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Status</a></li>
+            <li><a href="#" class="text-gray-300 hover:text-white transition-colors">Privacy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="border-t border-white border-opacity-10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <p class="text-gray-400 text-sm">© 2025 Linkly. All rights reserved.</p>
+        <div class="flex items-center space-x-6 mt-4 md:mt-0">
+          <a href="https://x.com/dornaoffical" class="text-gray-400 hover:text-white transition-colors">
+            <i class="fab fa-twitter text-xl"></i>
+          </a>
+          <a href="https://www.linkedin.com/in/dorna-gyawali/" class="text-gray-400 hover:text-white transition-colors">
+            <i class="fab fa-linkedin text-xl"></i>
+          </a>
+          <a href="https://github.com/drona-gyawali" class="text-gray-400 hover:text-white transition-colors">
+            <i class="fab fa-github text-xl"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

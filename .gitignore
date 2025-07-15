@@ -14,4 +14,4 @@ wheels/
 .env
 
 #redis dump file
-*.dump.rdp
+dump.rdb

@@ -21,24 +21,29 @@ redis_client = redis.from_url("redis://localhost")
 async def shorten_url(
     original_url: str,
     db_cm: AsyncIOMotorDatabase,
-    user_id: PyObjectId | str,
+    user_id: PyObjectId | str | None = None,  # user_id can be None now
     expiry: int | None = None,
 ) -> str:
     try:
         short_id = ShortIdGenerator.generate()
         short_url = settings.LOCAL_HOST + f"/{short_id}"
-        created_at = datetime.utcnow()
+        created_at = int(datetime.utcnow().timestamp())
 
-        await db_cm.urls.insert_one(
-            {
-                "original_url": original_url,
-                "short_id": short_id,
-                "short_url": short_url,
-                "user_id": PyObjectId(user_id),
-                "created_at": created_at,
-                "expiry": expiry,
-            }
-        )
+        url_doc = {
+            "original_url": original_url,
+            "short_id": short_id,
+            "short_url": short_url,
+            "user_id": PyObjectId(user_id),
+            "created_at": created_at,
+            "expiry": expiry,
+        }
+
+        if user_id:
+            if isinstance(user_id, str):
+                user_id = PyObjectId(user_id)
+            url_doc["user_id"] = user_id  # only add if available
+
+        await db_cm.urls.insert_one(url_doc)
 
         if expiry:
             await redis_client.set(f"expire:{short_id}", "1", ex=expiry)

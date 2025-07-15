@@ -1,12 +1,33 @@
-from typing import Optional
+from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr
+from bson import ObjectId
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserRegister(BaseModel):
     name: str
     email: EmailStr
     password: str
+
+
+class UrlOut(BaseModel):
+    original_url: str
+    short_id: str
+    created_at: Optional[int] = 0
+    expiry: Optional[int] = None
+
+
+class UserOut(BaseModel):
+    id: str = Field(..., alias="_id")
+    name: str
+    email: EmailStr
+    oauth: bool
+    urls: List[UrlOut] = []
+
+    class Config:
+        validate_by_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
 
 class Login(BaseModel):

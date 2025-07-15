@@ -1,4 +1,6 @@
-from fastapi import Depends, HTTPException
+from typing import Optional
+
+from fastapi import Depends, Header, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -18,3 +20,20 @@ async def get_current_user(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     return user
+
+
+async def optional_current_user(
+    Authorization: Optional[str] = Header(default=None),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    if not Authorization:
+        return None
+
+    scheme, _, token = Authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        return None
+
+    try:
+        return await get_current_user(token=token, db=db)
+    except HTTPException:
+        return None

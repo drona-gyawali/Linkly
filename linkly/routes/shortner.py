@@ -18,7 +18,7 @@ from fastapi.responses import RedirectResponse
 from fastapi_cache.decorator import cache
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from linkly.authentication.jwt.oauth2 import get_current_user
+from linkly.authentication.jwt.oauth2 import get_current_user, optional_current_user
 from linkly.database import get_db, get_db_instance
 from linkly.schemas import UrlRequest, UrlResponse
 from linkly.services.shortner import (
@@ -35,22 +35,11 @@ router = APIRouter(tags=["Url"])
 
 @router.post("/shorten", response_model=UrlResponse)
 async def create_short_url(
-    request: Request,
     data: UrlRequest,
     db: AsyncIOMotorDatabase = Depends(get_db),
+    user: Optional[dict] = Depends(optional_current_user),
 ):
-    user: Optional[dict] = None
-    token = request.headers.get("authorization")
-
-    if token and token.startswith("Bearer "):
-        token = token.split("Bearer ")[1]
-        try:
-            user = await get_current_user(token=token, db=db)
-        except Exception:
-            user = None
-
     user_id = user["_id"] if user else None
-
     short_url = await shorten_url(data.original_url, db, user_id, data.expiry)
     return UrlResponse(
         original_url=data.original_url, short_url=short_url, expiry=data.expiry

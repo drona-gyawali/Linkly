@@ -45,3 +45,15 @@ class UserRepository:
         if not hashed_password:
             return False
         return pwd_context.verify(plain_password, hashed_password)
+
+    async def get_user_urls(self, user_id: ObjectId):
+        cursor = self.db.urls.find({"user_id": ObjectId(user_id)})
+        return [
+            {
+                "original_url": url["original_url"],
+                "short_id": url["short_id"],
+                "created_at": url["created_at"],
+                "expiry": url["expiry"],
+            }
+            async for url in cursor
+        ]
