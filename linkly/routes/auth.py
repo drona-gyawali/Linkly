@@ -15,7 +15,7 @@ from linkly.services.auth import UserRepository
 
 router = APIRouter(tags=["Authentication"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-FRONTEND_URL = "http://127.0.0.1:5500/dashboard/dashboard.html"
+FRONTEND_URL = "https://drona-gyawali.github.io/linkly-web/dashboard/dashboard.html"
 
 
 @router.post("/register")
