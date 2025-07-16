@@ -32,15 +32,14 @@ async def redis_key_expiry_listener(redis_client):
                 await db.urls.delete_one({"short_id": short_id})
                 print(f"[✔] Deleted expired link: {short_id}")
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis_client = redis.from_url(settings.redis_url, ssl=True)
+    redis_url = settings.redis_url.replace("redis://", "rediss://")
+    redis_client = redis.from_url(redis_url)
     FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
-
+    
     asyncio.create_task(redis_key_expiry_listener(redis_client))
     yield
-
 
 app = FastAPI(lifespan=lifespan)
 
