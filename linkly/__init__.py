@@ -35,7 +35,7 @@ async def redis_key_expiry_listener(redis_client):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis_client = redis.from_url("redis://localhost")
+    redis_client = redis.from_url(settings.redis_url, ssl=True)
     FastAPICache.init(RedisBackend(redis_client), prefix="fastapi-cache")
 
     asyncio.create_task(redis_key_expiry_listener(redis_client))

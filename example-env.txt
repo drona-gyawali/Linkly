@@ -26,3 +26,6 @@ GOOGLE_CLIENT_SECRET="GCSxxxxxxxxxxxxxxxaDq1"
 # GitHub Oauth
 GITHUB_CLIENT_ID="OxxxxxxxxxsTL2"
 GITHUB_CLIENT_SECRET="72xxxxxxxxxxx1a0d"
+
+#redis url
+REDIS_URL = "redis://default:AT_xxxxxxxxxx@blessed-lioness-16360.upstash.io:6379"
