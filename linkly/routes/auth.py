@@ -95,7 +95,9 @@ async def auth_google_callback(request: Request, db: AsyncIOMotorDatabase = Depe
         token = await oauth.google.authorize_access_token(request)
         
 
-        user_info = await oauth.google.parse_id_token(request, token)
+        user_info_resp = await oauth.google.get("userinfo", token=token)
+        user_info = user_info_resp.json()
+
 
         email = user_info.get("email")
         name = user_info.get("name")
