@@ -94,8 +94,8 @@ async def auth_google_callback(request: Request, db: AsyncIOMotorDatabase = Depe
     try:
         token = await oauth.google.authorize_access_token(request)
         
-        resp = await oauth.google.get("userinfo", token=token)
-        user_info = resp.json()
+
+        user_info = await oauth.google.parse_id_token(request, token)
 
         email = user_info.get("email")
         name = user_info.get("name")
@@ -114,57 +114,15 @@ async def auth_google_callback(request: Request, db: AsyncIOMotorDatabase = Depe
         print(f"Google OAuth callback error: {e}")
         print(f"Full traceback: {traceback.format_exc()}")
         
-        # Handle specific state mismatch error
+        # Handle specific errors
         if "mismatching_state" in str(e).lower():
-            # Redirect to login page with error message
             error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_state_mismatch'})}"
+            return RedirectResponse(error_url)
+        elif "UnsupportedProtocol" in str(e):
+            error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_protocol_error'})}"
             return RedirectResponse(error_url)
         
         # For other errors, provide a generic OAuth failure message
-        error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_failed'})}"
-        return RedirectResponse(error_url)
-
-
-
-@router.get("/auth/github")
-async def auth_github(request: Request):
-    redirect_uri = str(request.url_for("auth_github_callback")).replace("http://", "https://")
-    return await oauth.github.authorize_redirect(request, redirect_uri)
-
-@router.get("/auth/github/callback")
-async def auth_github_callback(request: Request, db: AsyncIOMotorDatabase = Depends(get_db)):
-    try:
-        token = await oauth.github.authorize_access_token(request)
-
-        github_user_resp = await oauth.github.get("user", token=token)
-        profile = github_user_resp.json()
-
-        email = profile.get("email")
-        if not email:
-            emails_resp = await oauth.github.get("user/emails", token=token)
-            emails = emails_resp.json()
-            email = next((e["email"] for e in emails if e["primary"] and e["verified"]), None)
-
-        if not email:
-            raise HTTPException(status_code=400, detail="GitHub account has no accessible email")
-
-        name = profile.get("name") or profile.get("login")
-
-        repo = UserRepository(db)
-        user = await repo.get_or_create_oauth_user(name=name, email=email)
-
-        access_token = create_access_token(str(user["_id"]))
-        redirect_url = f"{FRONTEND_URL}?{urlencode({'token': access_token})}"
-        return RedirectResponse(redirect_url)
-        
-    except Exception as e:
-        print(f"GitHub OAuth callback error: {e}")
-        print(f"Full traceback: {traceback.format_exc()}")
-        
-        if "mismatching_state" in str(e).lower():
-            error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_state_mismatch'})}"
-            return RedirectResponse(error_url)
-        
         error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_failed'})}"
         return RedirectResponse(error_url)
 
