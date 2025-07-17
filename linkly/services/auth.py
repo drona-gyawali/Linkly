@@ -21,20 +21,14 @@ class UserRepository:
     async def find_by_id(self, user_id: str):
         return await self.db.users.find_one({"_id": ObjectId(user_id)})
 
-    # for basic login
-    async def create_user(self, name: str, email: EmailStr, password: str | None):
-        hashed = pwd_context.hash(password) if password else None
-        new_user = MongoUser(name=name, email=email, password=hashed, oauth=False)
-        await self.db.users.insert_one(new_user.dict(by_alias=True))
-        return new_user
-
-    # for oauth login
+    # for oauth login - fixed to return the inserted document with _id
     async def create_oauth_user(self, name: str, email: EmailStr):
         new_user = MongoUser(name=name, email=email, password=None, oauth=True)
-        await self.db.users.insert_one(new_user.dict(by_alias=True))
-        return new_user
+        result = await self.db.users.insert_one(new_user.dict(by_alias=True))
+        created_user = await self.find_by_id(str(result.inserted_id))
+        return created_user
 
-    # main logic to check outh users identity
+    # main logic to check oauth users identity
     async def get_or_create_oauth_user(self, name: str, email: EmailStr):
         user = await self.find_by_email(email)
         if user:
