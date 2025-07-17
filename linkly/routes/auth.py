@@ -58,11 +58,10 @@ async def auth_github_callback(
 ):
     token = await oauth.github.authorize_access_token(request)
 
-    # Getting GitHub profile
     github_user_resp = await oauth.github.get("user", token=token)
     profile = github_user_resp.json()
-    email = profile.get("email")
 
+    email = profile.get("email")
     if not email:
         emails_resp = await oauth.github.get("user/emails", token=token)
         emails = emails_resp.json()
@@ -71,16 +70,13 @@ async def auth_github_callback(
         )
 
     if not email:
-        raise HTTPException(
-            status_code=400, detail="GitHub account has no accessible email"
-        )
+        raise HTTPException(status_code=400, detail="GitHub account has no accessible email")
 
     name = profile.get("name") or profile.get("login")
 
     repo = UserRepository(db)
     user = await repo.get_or_create_oauth_user(name=name, email=email)
 
-    # TODO: fucking bug
     access_token = create_access_token(str(user["_id"]))
     redirect_url = f"{FRONTEND_URL}?{urlencode({'token': access_token})}"
     return RedirectResponse(redirect_url)
@@ -98,10 +94,8 @@ async def auth_google_callback(
     request: Request, db: AsyncIOMotorDatabase = Depends(get_db)
 ):
     token = await oauth.google.authorize_access_token(request)
-
-    user_info = token.get("userinfo")
-    if not user_info:
-        raise HTTPException(status_code=400, detail="User info not found in token")
+    resp = await oauth.google.get("userinfo", token=token)
+    user_info = resp.json()
 
     email = user_info.get("email")
     name = user_info.get("name")
