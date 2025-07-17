@@ -12,7 +12,7 @@ from linkly.authentication.oauth import oauth
 from linkly.database import get_db_instance as get_db
 from linkly.models.users import Token, UserOut, UserRegister
 from linkly.services.auth import UserRepository
-
+import traceback
 router = APIRouter(tags=["Authentication"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 FRONTEND_URL = "https://drona-gyawali.github.io/linkly-web/dashboard/dashboard.html"
@@ -87,10 +87,13 @@ async def auth_github_callback(request: Request, db: AsyncIOMotorDatabase = Depe
 async def auth_google(request: Request):
     redirect_uri = str(request.url_for("auth_google_callback")).replace("http://", "https://")
     return await oauth.google.authorize_redirect(request, redirect_uri)
+
+
 @router.get("/auth/google/callback")
 async def auth_google_callback(request: Request, db: AsyncIOMotorDatabase = Depends(get_db)):
     try:
         token = await oauth.google.authorize_access_token(request)
+        
         resp = await oauth.google.get("userinfo", token=token)
         user_info = resp.json()
 
@@ -106,9 +109,64 @@ async def auth_google_callback(request: Request, db: AsyncIOMotorDatabase = Depe
         access_token = create_access_token(str(user["_id"]))
         redirect_url = f"{FRONTEND_URL}?{urlencode({'token': access_token})}"
         return RedirectResponse(redirect_url)
+        
     except Exception as e:
         print(f"Google OAuth callback error: {e}")
-        raise HTTPException(status_code=500, detail="Google OAuth failed")
+        print(f"Full traceback: {traceback.format_exc()}")
+        
+        # Handle specific state mismatch error
+        if "mismatching_state" in str(e).lower():
+            # Redirect to login page with error message
+            error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_state_mismatch'})}"
+            return RedirectResponse(error_url)
+        
+        # For other errors, provide a generic OAuth failure message
+        error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_failed'})}"
+        return RedirectResponse(error_url)
+
+
+
+@router.get("/auth/github")
+async def auth_github(request: Request):
+    redirect_uri = str(request.url_for("auth_github_callback")).replace("http://", "https://")
+    return await oauth.github.authorize_redirect(request, redirect_uri)
+
+@router.get("/auth/github/callback")
+async def auth_github_callback(request: Request, db: AsyncIOMotorDatabase = Depends(get_db)):
+    try:
+        token = await oauth.github.authorize_access_token(request)
+
+        github_user_resp = await oauth.github.get("user", token=token)
+        profile = github_user_resp.json()
+
+        email = profile.get("email")
+        if not email:
+            emails_resp = await oauth.github.get("user/emails", token=token)
+            emails = emails_resp.json()
+            email = next((e["email"] for e in emails if e["primary"] and e["verified"]), None)
+
+        if not email:
+            raise HTTPException(status_code=400, detail="GitHub account has no accessible email")
+
+        name = profile.get("name") or profile.get("login")
+
+        repo = UserRepository(db)
+        user = await repo.get_or_create_oauth_user(name=name, email=email)
+
+        access_token = create_access_token(str(user["_id"]))
+        redirect_url = f"{FRONTEND_URL}?{urlencode({'token': access_token})}"
+        return RedirectResponse(redirect_url)
+        
+    except Exception as e:
+        print(f"GitHub OAuth callback error: {e}")
+        print(f"Full traceback: {traceback.format_exc()}")
+        
+        if "mismatching_state" in str(e).lower():
+            error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_state_mismatch'})}"
+            return RedirectResponse(error_url)
+        
+        error_url = f"{FRONTEND_URL}?{urlencode({'error': 'oauth_failed'})}"
+        return RedirectResponse(error_url)
 
 
 @router.get("/me", response_model=UserOut)

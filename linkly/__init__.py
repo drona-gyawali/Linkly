@@ -54,7 +54,12 @@ origins = [
 ]
 
 
-app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.SESSION_SECRET,
+    same_site = "lax"
+    # https_only=True    
+)
 
 app.add_middleware(
     CORSMiddleware,
