@@ -15,8 +15,8 @@ from linkly.settings import settings
 from linkly.utils.dtype import PyObjectId
 from linkly.utils.encode_url import ShortIdGenerator
 
-redis_client = redis.from_url(settings.redis_url)
-
+redis_url = settings.redis_url.replace("redis://", "rediss://")
+redis_client = redis.from_url(redis_url)
 
 async def shorten_url(
     original_url: str,
