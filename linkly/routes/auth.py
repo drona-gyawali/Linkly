@@ -47,7 +47,7 @@ async def login(
 # GitHub OAuth
 @router.get("/auth/github")
 async def auth_github(request: Request):
-    redirect_uri = request.url_for("auth_github_callback")
+    redirect_uri = str(request.url_for("auth_github_callback")).replace("http://", "https://")
     return await oauth.github.authorize_redirect(request, redirect_uri)
 
 
@@ -89,7 +89,7 @@ async def auth_github_callback(
 # Google Auth
 @router.get("/auth/google")
 async def auth_google(request: Request):
-    redirect_uri = request.url_for("auth_google_callback")
+    redirect_uri = str(request.url_for("auth_google_callback")).replace("http://", "https://")
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
