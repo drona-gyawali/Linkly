@@ -25,7 +25,7 @@ async def shorten_url(
     expiry: int | None = None,
 ) -> str:
     try:
-        short_id = ShortIdGenerator.generate()
+        short_id = ShortIdGenerator.generate()[:5]
         short_url = settings.LOCAL_HOST + f"/{short_id}"
         created_at = int(datetime.utcnow().timestamp())
 

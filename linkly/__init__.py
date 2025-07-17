@@ -48,8 +48,11 @@ origins = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
     "http://localhost",
+    "https://drona-gyawali.github.io",
+    "https://linkly-production.up.railway.app",
     "*",
 ]
+
 
 app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_SECRET)
 

@@ -5,7 +5,7 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from linkly.settings import settings
 
-client = AsyncIOMotorClient(settings.MONGODB_URI)
+client = AsyncIOMotorClient(settings.MONGODB_URI, tlsAllowInvalidCertificates=True)
 
 
 async def get_db() -> AsyncGenerator[AsyncIOMotorDatabase, None]:
